@@ -35,6 +35,10 @@ var bindSockets = function () {
     config.server = [];
     config.server = data;
   });
+
+  socket.on('map', function (data) {
+    console.log(data.aliens);
+  });
 };
 
 var init = function () {

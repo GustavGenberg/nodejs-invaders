@@ -31,6 +31,7 @@ var shotsCount = 0;
 io.on('connection', function (socket) {
 
   playerCount++;
+  console.log(playerCount);
   players[playerCount] = new Player (playerCount, 'Unnamed', socket);
 
 });
@@ -53,7 +54,7 @@ Player.prototype = {
 
     this.log('Connected');
 
-    this.socket.emit('config', {socket_id: socket.id});
+    this.socket.emit('config', {socket_id: this.socket.id});
     this.bindSockets();
 
   },
@@ -81,7 +82,7 @@ Alien.prototype = {
   log: function (data) {
     console.log('Alien ' + this.id + ': ' + data);
   },
-  init(): function () {
+  init: function () {
 
     aliens[this.id] = {id: this.id, x: this.x, y: this.y};
 
@@ -113,16 +114,25 @@ var createAlienGroup = function () {
   var alienX = 5;
   var alienY = 4;
 
-  for(var i = 0;i < alienY * alienX - 1) {
-    aliens[alienCount] = new Alien (alienCount, x, y);
+  for(var i = 0;i <= alienY - 1;i++) {
+    for(var j = 0; j <= alienX - 1;j++){
+      alienCount++;
+      aliens[alienCount] = new Alien (alienCount, i * 40, j * 40);
+    }
+
   }
 };
 
 setInterval(function () {
-  if(Object.keys(players).length == 2) {
+  if(Object.keys(players).length == 1) {
     if(createdAliens == false) {
       createAlienGroup();
       createdAliens = true;
     }
   }
 }, 5000);
+
+setInterval(function () {
+  io.emit('map', {aliens: aliens, shots: shots});
+  console.log(aliens);
+}, 1000 / config.map_fps);
