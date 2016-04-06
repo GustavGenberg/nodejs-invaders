@@ -1,2 +1,2 @@
 # nodejs-invaders
-LOLOLOLOL
+This is going to be the best game ever.
