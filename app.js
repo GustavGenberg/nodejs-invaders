@@ -18,6 +18,7 @@ String.prototype.replaceAll = function(search, replacement) {
 
 var players = {};
 var playerCount = 0;
+var sockets = {};
 
 var aliens = {};
 var alienCount = 0;
@@ -31,16 +32,16 @@ var shotsCount = 0;
 io.on('connection', function (socket) {
 
   playerCount++;
-  players[playerCount] = new Player (playerCount, 'Unnamed', socket);
+  players[playerCount] = new Player (playerCount, socket);
 
 });
 
-var Player = function (id, nickname, socket) {
+var Player = function (id, socket) {
 
   this.id = id;
-  this.nickname = nickname;
-  this.socket = socket;
-
+  this.x = 0;
+  this.y = 0;
+  sockets[this.id] = socket;
   this.init();
 
 }
@@ -50,22 +51,20 @@ Player.prototype = {
     console.log('Player ' + this.id + ': ' + data);
   },
   init: function () {
-    var player = this;
+    var socket = sockets[this.id];
 
-    player.log('Connected');
-
-    player.socket.emit('config', {socket_id: player.socket.id});
-    player.bindSockets();
+    this.log('Connected');
+    players[this.id] = {id: this.id, x: this.x, y: this.y};
+    this.bindSockets();
 
   },
   bindSockets: function () {
-    var player = this;
-    player.socket.on('disconnect', function () {
-      player.log('Disconnected');
+    var socket = sockets[this.id];
+
+    socket.on('disconnect', function () {
+      this.log('DI');
     });
-    player.socket.on('new-nickname', function (data) {
-      player.nickname = data.nickname.substring(0,10).replaceAll(' ', '');
-    });
+
   }
 };
 
@@ -134,6 +133,5 @@ setInterval(function () {
 }, 5000);
 
 setInterval(function () {
-  io.emit('map', {aliens: aliens, shots: shots});
-  console.log(aliens);
+  io.emit('map', {players: players, aliens: aliens, shots: shots});
 }, 1000 / config.map_fps);
