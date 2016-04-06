@@ -16,14 +16,14 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
-var players = [];
+var players = {};
 var playerCount = 0;
 
-var aliens = [];
+var aliens = {};
 var alienCount = 0;
 var createdAliens = false;
 
-var shots = [];
+var shots = {};
 var shotsCount = 0;
 
 
@@ -31,7 +31,6 @@ var shotsCount = 0;
 io.on('connection', function (socket) {
 
   playerCount++;
-  console.log(playerCount);
   players[playerCount] = new Player (playerCount, 'Unnamed', socket);
 
 });
@@ -51,19 +50,21 @@ Player.prototype = {
     console.log('Player ' + this.id + ': ' + data);
   },
   init: function () {
+    var player = this;
 
-    this.log('Connected');
+    player.log('Connected');
 
-    this.socket.emit('config', {socket_id: this.socket.id});
-    this.bindSockets();
+    player.socket.emit('config', {socket_id: player.socket.id});
+    player.bindSockets();
 
   },
   bindSockets: function () {
-    this.socket.on('disconnect', function () {
-      this.log('Disconnected');
+    var player = this;
+    player.socket.on('disconnect', function () {
+      player.log('Disconnected');
     });
-    this.socket.on('new-nickname', function (data) {
-      this.nickname = data.nickname.substring(0,10).replaceAll(' ', '');
+    player.socket.on('new-nickname', function (data) {
+      player.nickname = data.nickname.substring(0,10).replaceAll(' ', '');
     });
   }
 };
@@ -114,8 +115,8 @@ var createAlienGroup = function () {
   var alienX = 5;
   var alienY = 4;
 
-  for(var i = 0;i <= alienY - 1;i++) {
-    for(var j = 0; j <= alienX - 1;j++){
+  for(var i = 0;i <= alienX - 1;i++) {
+    for(var j = 0; j <= alienY - 1;j++){
       alienCount++;
       aliens[alienCount] = new Alien (alienCount, i * 40, j * 40);
     }

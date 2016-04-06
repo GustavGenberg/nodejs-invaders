@@ -12,6 +12,8 @@ config.player.height = 30;
 config.player.width = 30;
 
 var socket;
+var canvas = document.getElementById('game-canvas');
+var ctx = canvas.getContext('2d');
 
 function loadScript(url, callback) {
 	var head = document.getElementsByTagName('head')[0];
@@ -37,7 +39,10 @@ var bindSockets = function () {
   });
 
   socket.on('map', function (data) {
-    console.log(data.aliens);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(alien in data.aliens) {
+      ctx.drawImage(config.alien, data.aliens[alien].x, data.aliens[alien].y);
+    }
   });
 };
 
@@ -47,16 +52,13 @@ var init = function () {
 
   bindSockets();
 
-  var canvas = document.getElementById('game-canvas');
-  var ctx = canvas.getContext('2d');
-
   var player = [];
   player.x = 0;
   player.y = 0;
 
   player.d = true;
 
-  setInterval(function () {
+  /*setInterval(function () {
 
     if(player.d == true) {
       player.x++;
@@ -70,9 +72,8 @@ var init = function () {
       player.d = true;
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(config.player, player.x, player.y);
-  }, 1000 / 30);
+
+  }, 1000 / 30);*/
 
 
 };
