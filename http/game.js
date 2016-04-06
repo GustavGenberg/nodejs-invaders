@@ -17,10 +17,10 @@ loadScript('http://code.jquery.com/jquery-2.2.2.min.js', function () {
   loadScript(config.socket_protocol + '://' + config.socket_host + ':' + config.socket_port + '/socket.io/socket.io.js', function () {
     init();
   });
-}
+});
 
 var init = function () {
 
-  
+
 
 };

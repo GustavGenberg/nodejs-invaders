@@ -10,3 +10,9 @@ app.listen(config.express_port, function () {
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/http/index.html');
 });
+app.get('/game.js', function (req, res) {
+  res.sendFile(__dirname + '/http/game.js');
+});
+app.get('/game.css', function (req, res) {
+  res.sendFile(__dirname + '/http/game.css');
+});

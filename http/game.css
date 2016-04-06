@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  border: 1px solid black;
+  height: 300px;
+  position: fixed;
+  top: calc(50% - 150px);
+  left: calc(50% - 150px);
+}
