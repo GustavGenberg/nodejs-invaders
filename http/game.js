@@ -11,6 +11,8 @@ config.player.src = '/images/player.png';
 config.player.height = 30;
 config.player.width = 30;
 
+var socket;
+
 function loadScript(url, callback) {
 	var head = document.getElementsByTagName('head')[0];
 	var script = document.createElement('script');
@@ -26,9 +28,20 @@ loadScript('http://code.jquery.com/jquery-2.2.2.min.js', function () {
   });
 });
 
+var bindSockets = function () {
+  socket = io(config.socket_host + ':' + config.socket_port);
+
+  socket.on('config', function (data) {
+    config.server = [];
+    config.server = data;
+  });
+};
+
 var init = function () {
 
   console.log('init()');
+
+  bindSockets();
 
   var canvas = document.getElementById('game-canvas');
   var ctx = canvas.getContext('2d');
@@ -56,5 +69,6 @@ var init = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(config.player, player.x, player.y);
   }, 1000 / 30);
+
 
 };
