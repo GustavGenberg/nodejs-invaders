@@ -8,6 +8,8 @@ config.alien = new Image ();
 config.alien.src = '/images/alien.png';
 config.player = new Image ();
 config.player.src = '/images/player.png';
+config.player.height = 30;
+config.player.width = 30;
 
 function loadScript(url, callback) {
 	var head = document.getElementsByTagName('head')[0];
@@ -31,6 +33,28 @@ var init = function () {
   var canvas = document.getElementById('game-canvas');
   var ctx = canvas.getContext('2d');
 
-  ctx.drawImage(config.player, 10, 10);
+  var player = [];
+  player.x = 0;
+  player.y = 0;
+
+  player.d = true;
+
+  setInterval(function () {
+
+    if(player.d == true) {
+      player.x++;
+    } else {
+      player.x--;
+    }
+
+    if(player.x == canvas.width - config.player.width) {
+      player.d = false
+    } else if (player.x == 0){
+      player.d = true;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(config.player, player.x, player.y);
+  }, 1000 / 30);
 
 };
