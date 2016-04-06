@@ -4,6 +4,9 @@ config.socket_protocol = 'http';
 config.socket_host = 'localhost';
 config.socket_port = 7777;
 
+config.alien = '/images/alien.png';
+config.player = '/images/player.png';
+
 function loadScript(url, callback) {
 	var head = document.getElementsByTagName('head')[0];
 	var script = document.createElement('script');
