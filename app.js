@@ -133,10 +133,16 @@ Alien.prototype = {
   }
 };
 
-var Shot = function (id, x, y, owner) {
+var createShot = function (x, y, d, o) {
+  shotsCount++;
+  shots[shotsCount] = new Shot (shotsCount, x, y, d, o)
+}
+
+var Shot = function (id, x, y, d, owner) {
   this.id = id;
   this.x = x;
   this.y = y;
+  this.d = d;
   this.owner = owner;
 
   this.init();
@@ -147,6 +153,16 @@ Shot.prototype = {
     console.log('Shot ' + this.id + ': ' + data);
   },
   init: function () {
+
+    intervals[shotsCount] = setInterval(function () {
+      if(d == 0) {
+        this.y--;
+      }
+
+      if(d == 1) {
+        this.y++;
+      }
+    }, 200);
 
   }
 };

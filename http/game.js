@@ -55,6 +55,14 @@ var bindSockets = function () {
     }
     for(shot in data.shots) {
       //ctx.drawImage(config.player, data.players[player].x, data.players[player].y);
+
+      if(data.shots[shot].owner == config.server.id) {
+        ctx.drawImage(config.shot, canvas.width - data.players[player].x - data.players[player].width, canvas.height - 40);
+        ctx.fillText(data.players[player].nickname, (canvas.width - data.players[player].x - data.players[player].width) - (data.players[player].nickname.length / 2), canvas.height - 40);
+      } else {
+        ctx.drawImage(config.player, data.players[player].x, 10);
+        ctx.fillText(data.players[player].nickname, data.players[player].x - (data.players[player].nickname.length / 2), 10);
+      }
     }
   });
   socket.on('info', function (data) {
