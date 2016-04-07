@@ -10,6 +10,8 @@ config.player = new Image ();
 config.player.src = '/images/player.png';
 config.player.height = 30;
 config.player.width = 30;
+config.shot = new Image ();
+config.shot.src = '/images/shot.png';
 
 var socket;
 var canvas = document.getElementById('game-canvas');
@@ -57,11 +59,21 @@ var bindSockets = function () {
       //ctx.drawImage(config.player, data.players[player].x, data.players[player].y);
 
       if(data.shots[shot].owner == config.server.id) {
-        ctx.drawImage(config.shot, canvas.width - data.players[player].x - data.players[player].width, canvas.height - 40);
-        ctx.fillText(data.players[player].nickname, (canvas.width - data.players[player].x - data.players[player].width) - (data.players[player].nickname.length / 2), canvas.height - 40);
+
+        if(data.shots[shot].d == 0) {
+          ctx.drawImage(config.shot, canvas.width - data.shots[shot].x - (config.player.width / 2), data.shots[shot].y);
+        }
+        if(data.shots[shot].d == 1) {
+          ctx.drawImage(config.shot, canvas.width - data.shots[shot].x - (config.player.width / 2), canvas.height - data.shots[shot].y);
+        }
+
       } else {
-        ctx.drawImage(config.player, data.players[player].x, 10);
-        ctx.fillText(data.players[player].nickname, data.players[player].x - (data.players[player].nickname.length / 2), 10);
+        if(data.shots[shot].d == 1) {
+          ctx.drawImage(config.shot, data.shots[shot].x + (config.player.width / 2), data.shots[shot].y);
+        }
+        if(data.shots[shot].d == 0) {
+          ctx.drawImage(config.shot, data.shots[shot].x + (config.player.width / 2), canvas.height - data.shots[shot].y);
+        }
       }
     }
   });

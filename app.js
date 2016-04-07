@@ -54,8 +54,10 @@ var Player = function (id, socket, rotation) {
 
   if(rotation == 0) {
     this.y = 10;
+    this.d = 1;
   } else if(rotation == 360) {
     this.y = config.map_height - config.player_height - 10;
+    this.d = 0;
   } else {
     this.y = 0;
   }
@@ -108,6 +110,9 @@ Player.prototype = {
           player.x++;
         }
       }
+      if(data.activeKeys[32] == true) {
+        createShot(player.x, player.y, player.d, player.id);
+      }
     });
   }
 };
@@ -153,14 +158,22 @@ Shot.prototype = {
     console.log('Shot ' + this.id + ': ' + data);
   },
   init: function () {
+    var shot = this;
 
-    intervals[shotsCount] = setInterval(function () {
-      if(d == 0) {
-        this.y--;
+    intervals[shot.id] = setInterval(function () {
+      if(shot.y > config.map_height) {
+        delete shots[shot.id];
+        clearInterval(intervals[shot.id]);
       }
-
-      if(d == 1) {
-        this.y++;
+      if(shot.y < 0) {
+        delete shots[shot.id];
+        clearInterval(intervals[shot.id]);
+      }
+      if(shot.d == 0) {
+        shot.y = shot.y - 10;
+      }
+      if(shot.d == 1) {
+        shot.y = shot.y + 10;
       }
     }, 200);
 
