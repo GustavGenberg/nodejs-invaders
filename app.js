@@ -19,6 +19,7 @@ String.prototype.replaceAll = function(search, replacement) {
 var players = {};
 var playerCount = 0;
 var sockets = {};
+var intervals = {};
 
 var aliens = {};
 var alienCount = 0;
@@ -32,15 +33,40 @@ var shotsCount = 0;
 io.on('connection', function (socket) {
 
   playerCount++;
-  players[playerCount] = new Player (playerCount, socket);
+
+  if(playerCount == 1) {
+    players[playerCount] = new Player (playerCount, socket, 0);
+  } else if (playerCount == 2) {
+    players[playerCount] = new Player (playerCount, socket, 360);
+  } else {
+    socket.emit('info', {msg: 'The game server is full! You can\'t play, but you can watch as the other plays'});
+  }
+
+  // DISCONNECT CLIENT: socket.disconnect();
 
 });
 
-var Player = function (id, socket) {
+var Player = function (id, socket, rotation) {
 
   this.id = id;
+  this.socket_id = socket.id;
   this.x = 0;
-  this.y = 0;
+
+  if(rotation == 0) {
+    this.y = 10;
+  } else if(rotation == 360) {
+    this.y = config.map_height - config.player_height - 10;
+  } else {
+    this.y = 0;
+  }
+
+  this.nickname = 'Unnames' + playerCount;
+
+  this.width = config.player_width;
+  this.height = config.player_height;
+
+
+  this.rotation = rotation;
   sockets[this.id] = socket;
   this.init();
 
@@ -54,17 +80,35 @@ Player.prototype = {
     var socket = sockets[this.id];
 
     this.log('Connected');
-    players[this.id] = {id: this.id, x: this.x, y: this.y};
+
     this.bindSockets();
+
+    socket.emit('config', {socket_id: socket.id, id: this.id/*rotation: this.rotation*/});
+
 
   },
   bindSockets: function () {
     var socket = sockets[this.id];
+    var player = this;
 
     socket.on('disconnect', function () {
-      this.log('DI');
+      delete players[player.id];
+      playerCount--;
+      player.log('Disconnected');
     });
 
+    socket.on('new-position', function (data) {
+      if(data.activeKeys[39] == true) {
+        if(player.x > 0) {
+          player.x--;
+        }
+      }
+      if(data.activeKeys[37] == true) {
+        if(player.x < config.map_width - config.player_width) {
+          player.x++;
+        }
+      }
+    });
   }
 };
 
@@ -84,7 +128,7 @@ Alien.prototype = {
   },
   init: function () {
 
-    aliens[this.id] = {id: this.id, x: this.x, y: this.y};
+
 
   }
 };
@@ -114,17 +158,17 @@ var createAlienGroup = function () {
   var alienX = 5;
   var alienY = 4;
 
-  for(var i = 0;i <= alienX - 1;i++) {
-    for(var j = 0; j <= alienY - 1;j++){
+  for(var x = 0;x <= alienX - 1;x++) {
+    for(var y = 0; y <= alienY - 1;y++){
       alienCount++;
-      aliens[alienCount] = new Alien (alienCount, i * 40, j * 40);
+      aliens[alienCount] = new Alien (alienCount, x * (config.alien_width + config.alien_spacing), y * (config.alien_width + config.alien_spacing));
     }
-
   }
+  console.log('Alien Group spawned');
 };
 
 setInterval(function () {
-  if(Object.keys(players).length == 1) {
+  if(Object.keys(players).length == 2) {
     if(createdAliens == false) {
       createAlienGroup();
       createdAliens = true;

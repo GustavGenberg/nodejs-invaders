@@ -14,6 +14,7 @@ config.player.width = 30;
 var socket;
 var canvas = document.getElementById('game-canvas');
 var ctx = canvas.getContext('2d');
+var activeKeys = [];
 
 function loadScript(url, callback) {
 	var head = document.getElementsByTagName('head')[0];
@@ -43,6 +44,50 @@ var bindSockets = function () {
     for(alien in data.aliens) {
       ctx.drawImage(config.alien, data.aliens[alien].x, data.aliens[alien].y);
     }
+    for(player in data.players) {
+      if(data.players[player].id == config.server.id && config.server.socket_id == data.players[player].socket_id) {
+        ctx.drawImage(config.player, canvas.width - data.players[player].x - data.players[player].width, canvas.height - 40);
+        ctx.fillText(data.players[player].nickname, (canvas.width - data.players[player].x - data.players[player].width) - (data.players[player].nickname.length / 2), canvas.height - 40);
+      } else {
+        ctx.drawImage(config.player, data.players[player].x, 10);
+        ctx.fillText(data.players[player].nickname, data.players[player].x - (data.players[player].nickname.length / 2), 10);
+      }
+    }
+    for(shot in data.shots) {
+      //ctx.drawImage(config.player, data.players[player].x, data.players[player].y);
+    }
+  });
+  socket.on('info', function (data) {
+    $(".status").html(data.msg);
+  });
+
+  setInterval(function () {
+    socket.emit('new-position', {activeKeys: activeKeys});
+  }, config.emit_interval);
+};
+
+var bindKeys = function () {
+  document.addEventListener('keydown', function (event) {
+    if(event.keyCode == 37) {
+      activeKeys[37] = true;
+    }
+    if(event.keyCode == 39) {
+      activeKeys[39] = true;
+    }
+    if(event.keyCode == 32) {
+      activeKeys[32] = true;
+    }
+  });
+  document.addEventListener('keyup', function (event) {
+    if(event.keyCode == 37) {
+      delete activeKeys[37];
+    }
+    if(event.keyCode == 39) {
+      delete activeKeys[39];
+    }
+    if(event.keyCode == 32) {
+      delete activeKeys[32];
+    }
   });
 };
 
@@ -51,6 +96,7 @@ var init = function () {
   console.log('init()');
 
   bindSockets();
+  bindKeys();
 
   var player = [];
   player.x = 0;
@@ -74,6 +120,10 @@ var init = function () {
 
 
   }, 1000 / 30);*/
+
+  setInterval(function () {
+    console.log(activeKeys);
+  }, 1000);
 
 
 };
